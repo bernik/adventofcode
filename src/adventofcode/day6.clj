@@ -1,6 +1,5 @@
 (ns adventofcode.day6
-  (:require [clojure.pprint :refer [pprint]]
-            [clojure.java.io :as io]))
+  (:require [clojure.java.io :as io]))
 
 (def grid (into {} (for [x (range 0 1000) y (range 0 1000)] [[x y] 0])))
 
