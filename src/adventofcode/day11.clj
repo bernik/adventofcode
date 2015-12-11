@@ -33,4 +33,4 @@
                  (with-two-pairs? %)))))
 
 (def part-one (first filtered-passwords))
-(def part-two (take 3 filtered-passwords))
+(def part-two (second filtered-passwords))
