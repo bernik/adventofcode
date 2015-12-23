@@ -29,15 +29,8 @@
                    {:name "defence +3" :cost 80  :damage 0 :armor 3}]})
 
 (defn win? [me boss]
-  (let [my-damage (max 1 (- (:damage me) (:armor boss)))
-        boss-damage (max 1 (- (:damage boss) (:armor me)))]
-    (loop [my-hp (:hp me)
-           boss-hp (:hp boss)]
-      (if (>= 0 (- boss-hp my-damage))
-        true 
-        (if (>= 0 (- my-hp boss-damage))
-          false
-          (recur (- my-hp boss-damage) (- boss-hp my-damage)))))))
+  (<= (inc (Math/floor (/ (:hp boss) (max 1 (- (:damage me) (:armor boss))))))
+      (Math/ceil (/ (:hp me) (max 1 (- (:damage boss) (:armor me)))))))
 
 (defn apply-items [items]
   (reduce #(-> %1 
