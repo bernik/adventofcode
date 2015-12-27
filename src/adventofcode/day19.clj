@@ -31,3 +31,12 @@
                    (mapcat #(apply-replacement molecule %))
                    (into #{})
                    count))
+
+(def part-two (loop [m molecule
+                     c 0]
+                (if (= m "e")
+                  c
+                  (let [r (->> replacements 
+                               (filter #(not= -1 (.indexOf m (second %))))
+                               first)]
+                    (recur (apply #(str/replace-first m %2 %1) r) (inc c))))))
