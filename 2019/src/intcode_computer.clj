@@ -1,96 +1,120 @@
 (ns intcode-computer)
 
-(def state (atom []))
-
+(def debug? true)
 (def debug? false)
 
-(defn get-val [pos mode]
+(defn get-val [memory cursor mode]
   (if (= mode "0")
-    (get @state (get @state pos) :not-found)
-    (get @state pos :not-found)))
+    (get memory (get memory cursor) :not-found)
+    (get memory cursor :not-found)))
+
+(def instruction-names {"99" :halt
+                        "01" :add 
+                        "02" :multiply
+                        "03" :read-input  
+                        "04" :print  
+                        "05" :jump-if-true
+                        "06" :jump-if-false 
+                        "07" :less-than 
+                        "08" :equals})
 
 (defn parse-instruction [s]
   (let [[_ m3 m2 m1 op] (re-find #"(\d)(\d)(\d)(\d\d)" (format "%05d" s))]
-    {:op    op
+    {:op    (instruction-names op)
      :mode1 m1
      :mode2 m2
      :mode3 m3}))
 
 
-(defn run [init-state & input]
-  (reset! state init-state)
-  (loop [pos 0 
+(defn run [memory cursor & input]
+  (loop [memory memory
+         cursor cursor 
          input input
          output nil]
-    (let [{:keys [op mode1 mode2 mode3]} (parse-instruction (get @state pos))]
+    (let [{:keys [op mode1 mode2 mode3]} (parse-instruction (get memory cursor))]
       (when debug?
-        (println (list @state 
-                       pos 
+        (println (list memory 
+                       cursor 
                        op 
-                       (get-val (+ pos 1) "1")
-                       (get-val (+ pos 1) mode1)
-                       (get-val (+ pos 2) "1")
-                       (get-val (+ pos 2) mode2)
-                       (get-val (+ pos 3) "1")
-                       (get-val (+ pos 3) mode3))))
+                       (get-val memory (+ cursor 1) "1")
+                       (get-val memory (+ cursor 1) mode1)
+                       (get-val memory (+ cursor 2) "1")
+                       (get-val memory (+ cursor 2) mode2)
+                       (get-val memory (+ cursor 3) "1")
+                       (get-val memory (+ cursor 3) mode3))))
         
       (case op
-        "99"  ;; halt
-        (or output (get @state 0))
+        :halt
+        [:exit (or output (get memory 0))]
 
-        "01" ;; add 
-        (do 
-          (swap! state assoc (get @state (+ pos 3))
-                             (+ (get-val (+ pos 1) mode1) (get-val (+ pos 2) mode2))) 
-          (recur (+ pos 4) input output))
+        :add
+        (recur (assoc memory
+                      (get memory (+ cursor 3))
+                      (+ (get-val memory (+ cursor 1) mode1)
+                         (get-val memory (+ cursor 2) mode2)))
+               (+ cursor 4)
+               input
+               output)
 
-        "02" ;; multiply
-        (do 
-          (swap! state assoc (get @state (+ pos 3))
-                             (* (get-val (+ pos 1) mode1) (get-val (+ pos 2) mode2)))
-          (recur (+ pos 4) input output))
+        :multiply
+        (recur (assoc memory
+                      (get memory (+ cursor 3))
+                      (* (get-val memory (+ cursor 1) mode1) 
+                         (get-val memory (+ cursor 2) mode2)))
+               (+ cursor 4)
+               input
+               output)
 
-        "03" ;; read input  
-        (do 
-          (swap! state assoc (get @state (+ pos 1)) (first input))
-          (recur (+ pos 2) (rest input) output))
+        :read-input
+        (if (seq input)
+          (recur (assoc memory
+                        (get memory (+ cursor 1))
+                        (first input))
+                 (+ cursor 2)
+                 (rest input)
+                 output)
+          [:pending output memory cursor])
 
-        "04" ;; print  
-        (do
-          (println (get-val (+ pos 1) mode1))
-          (recur (+ pos 2) input output))
+        :print
+        (recur memory 
+               (+ cursor 2) 
+               input 
+               (get-val memory (+ cursor 1) mode1))
 
-        "05" ;; jump if true
-        (recur 
-          (if (zero? (get-val (+ pos 1) mode1))
-              (+ pos 3)
-              (get-val (+ pos 2) mode2))
-          input
-          output)
+        :jump-if-true
+        (recur memory
+               (if (zero? (get-val memory (+ cursor 1) mode1))
+                 (+ cursor 3)
+                 (get-val memory (+ cursor 2) mode2))
+               input
+               output)
 
-        "06" ;; jump if false 
-        (recur
-          (if (zero? (get-val (+ pos 1) mode1))
-              (get-val (+ pos 2) mode2)
-              (+ pos 3))
-          input
-          output)
+        :jump-if-false
+        (recur memory
+               (if (zero? (get-val memory (+ cursor 1) mode1))
+                 (get-val memory (+ cursor 2) mode2)
+                 (+ cursor 3))
+               input
+               output)
 
-        "07" ;; less than 
-        (do 
-          (swap! state assoc 
-                      (get @state (+ pos 3))
-                      (if (< (get-val (+ pos 1) mode1)
-                             (get-val (+ pos 2) mode2))
+        :less-than
+        (recur (assoc memory
+                      (get memory (+ cursor 3))
+                      (if (< (get-val memory (+ cursor 1) mode1)
+                             (get-val memory (+ cursor 2) mode2))
                         1
                         0))
-          (recur (+ pos 4) input output))
+               (+ cursor 4)
+               input
+               output)
 
-        "08" ;; equals 
-        (do 
-          (swap! state assoc (get @state (+ pos 3))
-                             (if (= (get-val (+ pos 1) mode1)
-                                    (get-val (+ pos 2) mode2))
-                               1
-                               0))
-          (recur (+ pos 4) input output))))))
+        :equals
+        (recur (assoc memory 
+                      (get memory (+ cursor 3))
+                      (if (= (get-val memory (+ cursor 1) mode1)
+                             (get-val memory (+ cursor 2) mode2))
+                        1
+                        0))
+               (+ cursor 4)
+               input
+               output)))))

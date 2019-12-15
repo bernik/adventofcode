@@ -6,6 +6,6 @@
 (def input (into [] (map read-string (str/split (slurp (io/file (io/resource "day5.txt"))) #","))))
 
 ;; part 1
-(computer/run input 1)
+(computer/run input 0 1)
 ;; part 2
-(computer/run input 5)
+(computer/run input 0 5)
