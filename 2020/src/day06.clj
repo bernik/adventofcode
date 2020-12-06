@@ -11,7 +11,6 @@
 
 ;; part 1 
 (->> input 
-    ;  (map parse-group-1)
      (map #(count (disj (set %) \newline)))
      (apply +)
      println)
