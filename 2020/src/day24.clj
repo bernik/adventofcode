@@ -1,4 +1,4 @@
-(ns day23
+(ns day24
   (:require [clojure.pprint :refer [pprint]]
             [clojure.java.io :as io]))
 
