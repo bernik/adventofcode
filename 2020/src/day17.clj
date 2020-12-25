@@ -24,7 +24,7 @@
        (mapcat identity)
        (into {})))
 
-(defn neigbours [db [x y z w] part2?]
+(defn neighbours [db [x y z w] part2?]
   (for [x' [(dec x) x (inc x)]
         y' [(dec y) y (inc y)]
         z' [(dec z) z (inc z)]
@@ -34,7 +34,7 @@
     [[x' y' z' w'] active']))
 
 (defn next-cube [db [point active] part2?]
-  (let [c (->> (neigbours db point part2?)
+  (let [c (->> (neighbours db point part2?)
                (filter second)
                count)
         active' (if active
