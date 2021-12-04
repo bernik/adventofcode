@@ -9,3 +9,9 @@ pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
+*.lsp/
+*.clj=kondo
+.clj=kondo
+.cpcache/
+.DS_Store
+.nrepl-port
