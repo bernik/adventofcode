@@ -50,11 +50,7 @@
         rows (inc (apply max (map second points)))
         row (into [] (take cols (repeat 0)))
         grid (into [] (take rows (repeat row)))]
-    (reductions #(do
-                   (println [%2 %1])
-                   (update-in %1 (reverse %2) inc))
-                grid 
-                points)))
+    (reduce #(update-in %1 (reverse %2) inc) grid points)))
 
 (comment
   (part-1 test-input)
