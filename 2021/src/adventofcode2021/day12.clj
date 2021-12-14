@@ -18,36 +18,33 @@
 (defn upper? [s] (= s (str/upper-case s)))
 
 (defn paths
-  ([m] (paths false m "start" []))
-  ([allow-twice? m] (paths allow-twice? m "start" []))
-  ([allow-twice? m k res]
-   (if (= k "end")
-     [(conj res k)]
-     (let [f (if allow-twice?
-               #(let [fq (frequencies (filter lower? res))
-                      n (fq % 0)]
-                  (if (some #{2} (vals fq))
-                    (zero? n)
-                    (> 2 n)))
-               #(not (.contains res %)))
+  ([m]              (paths false        m ["start"]))
+  ([allow-twice? m] (paths allow-twice? m ["start"]))
+  ([allow-twice? m path]
+   (if (= (peek path) "end")
+     [path]
+     (let [fq (frequencies (filter #(lower? %) path))
+           f (if (or (not allow-twice?)
+                     (some #{2} (vals fq)))
+               #(not (.contains path %))
+               #(#{0 1} (fq % 0)))
            children
-           (->> (get m k [])
+           (->> (get m (peek path) [])
                 (filter #(not= "start" %))
                 (filterv #(or (upper? %)
                               (= "end" %)
                               (f %))))]
        (if (empty? children)
          []
-         (mapcat #(paths allow-twice? m % (conj res k)) children))))))
+         (mapcat #(paths allow-twice? m (conj path %)) children))))))
 
 (def part-1 (comp count (partial paths)))
 (def part-2 (comp count (partial paths true)))
 
-(comment 
+(comment
   (part-1 test-input)
   (part-1 test2-input)
   (part-1 input)
   (part-2 test-input)
   (part-2 test2-input)
-  (part-2 input)
-  )
+  (part-2 input)) 
