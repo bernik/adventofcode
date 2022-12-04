@@ -16,11 +16,9 @@
 
 (defn part-1 [input]
   (->> input
-       (filter (fn [[a1 b1 a2 b2]]
-                 (or (and (<= a1 a2)
-                          (<= b2 b1))
-                     (and (<= a2 a1)
-                          (<= b1 b2)))))
+       (filter (fn [[a1 b1 a2 b2]] 
+                 (or (<= a1 a2 b2 b1)
+                     (<= a2 a1 b1 b2))))
        count))
 
 
