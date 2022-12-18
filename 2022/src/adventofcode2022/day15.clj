@@ -7,7 +7,7 @@
        io/reader
        line-seq
        (map (fn [line] 
-              (let [[x1 y1 x2 y2] (->> (re-seq #"\d+" line)
+              (let [[x1 y1 x2 y2] (->> (re-seq #"-?\d+" line)
                                        (map parse-long))]
                 {:sensor [x1 y1]
                  :beacon [x2 y2]})))))
@@ -21,33 +21,29 @@
   (+ (abs (- x2 x1)) (abs (- y2 y1))))
 
 
+(defn merge-intervals [coll]
+  (reduce 
+    (fn [[[a b] :as res] [c d]]
+      (cond 
+        (nil? a)
+        (conj res [c d])
 
-(defn sensor-area [sensor beacon]
-  (let [d (distance sensor beacon)]
-    (->> (for [x (range (- (first sensor) d) (inc (+ (first sensor) d)))
-               y (range (- (second sensor) d) (inc (+ (second sensor) d)))
-               :when (>= d (distance [x y] sensor))]
-           [x y]))))
+        (<= c b d)
+        (conj (rest res) [a d])
 
+        (= 1 (- c b))
+        (conj (rest res) [a d])
 
+        (<= d b)
+        res
 
-(let [row 10
-      [sx sy :as sensor] [8 7]
-      [bx by :as beacon] [2 10]
-      d (distance sensor beacon)
-      dx (abs (- sy row))]
-  (range (+ dx (- sx d)) (inc (- (+ sx d) dx))))
-
-
-; (? - sx) + (row - sy) = d
-; ? - sx + row - sy = d 
-; ? = d - row + sx + sy
-; ?1 = abs(?)
-; ?2 = -(abs ?)
+        :else 
+        (conj res [c d])))
+    (list)
+    coll))
 
 
-; (let [input test-input row 10]
-(let [input input row 2000000]
+(defn covered-intervals [input row]
   (->> input
     (map 
      (fn [{:keys [sensor beacon]}]
@@ -55,32 +51,42 @@
              [bx by] beacon
              d (distance sensor beacon)
              dx (abs (- sy row))]
-         (if (<= (- sy d) row (+ sy d))
-           (->> (range (+ dx (- sx d)) (inc (- (+ sx d) dx)))
-             set
-             )
-           #{}))))
-    (apply clojure.set/union)
-    ; sort
-    count))
+         [(-> sx (- d) (+ dx)) (-> sx (+ d) (- dx))])))
+    (filter #(< (first %) (second %)))
+    sort
+    merge-intervals))
 
 
-; 5948482 too low
+(defn part-1 [input row]
+  (let [beacons (->> input 
+                     (map :beacon) 
+                     (into #{})
+                     (filter #(= row (second %)))
+                     count)
+        covered (->> (covered-intervals input row)
+                     (map #(inc (- (second %) (first %))))
+                     (apply +)) ]
+    (- covered beacons)))
 
-; (defn part-1 [input row]
-;   (let [beacons (->> input
-;                      (map :beacon)
-;                      (into #{}))]
-;     (->> input
-;          (mapcat #(sensor-area (:sensor %) (:beacon %)))
-;          (into #{})
-;          (filter #(= row (second %)))
-;          (filter #(not (beacons %)))
-;          count)))
+
+(defn part-2 [input limit]
+  (->> (range limit)
+       (map-indexed #(vector %1 (covered-intervals input %2)))
+       (filter #(< 1 (count (second %))))
+       (map (fn [[y xs]]
+              (+ y
+                 (->> xs 
+                      (map second)
+                      (apply min)
+                      inc
+                      (* 4000000)))))
+       first))
+
 
 (comment 
   (part-1 test-input 10)
   (part-1 input 2000000)
-  )
+  (part-2 test-input 20)
+  (part-2 input 4000000))
 
 
