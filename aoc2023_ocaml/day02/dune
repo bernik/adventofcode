@@ -1,0 +1,4 @@
+(executable 
+    (name day02)
+    (public_name day02)
+    (libraries aoc core str))
