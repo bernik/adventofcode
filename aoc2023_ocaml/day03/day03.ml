@@ -6,72 +6,76 @@ let match_all pattern s =
     let rec matches acc start = 
         try 
             let _ = Str.search_forward re s start in
-            let res = Str.matched_string s, Str.match_beginning (), Str.match_end () in
-            matches (res::acc) (Str.match_end () + 1)
+            let res = Str.matched_string s, Str.match_beginning (), Str.match_end () - 1 in
+            matches (res::acc) (Str.match_end ())
         with _ -> List.rev acc
     in 
     matches [] 0
 ;;
 
 
-let string_slice s ~from ~to_ = 
-    let max_length = String.length s in
-    let pos = Int.max from 0 in
-    let len = (Int.min to_ max_length) - pos in
-    String.sub s ~pos ~len
-;;
+let belongs point rect = 
+    let px, py = point in 
+    let rx1, ry1, rx2, ry2 = rect in
+    (rx1 <= px) && (px <= rx2) && (ry1 <= py) && (py <= ry2)
+;; 
 
 
-let has_adjacent_symbols schema row_index (num, x1, x2) =
-    (* print_endline "--------------"; *)
-    (* Printf.printf "%d: %s, %d, %d\n" row_index num x1 x2; *)
-    let schema_length = Array.get schema 0 |> String.length in
-    let check_rows = 
-        [row_index - 1; row_index; row_index + 1]
-        |> List.map ~f:(fun idx -> try Array.get schema idx with _ -> String.make schema_length '.')
-        |> List.map ~f:(fun s -> string_slice s ~from:(x1 - 1) ~to_:(x2 + 1))
+let parse file = 
+    let numbers = 
+        Aoc.read_lines file
+        |> List.concat_mapi ~f:(fun y line ->
+            match_all "[0-9]+" line
+            |> List.map ~f:(fun (number, x1, x2) ->  
+                Int.of_string number, (x1-1, y-1, x2+1, y+1)
+            )
+        ) 
     in
-    check_rows |> String.concat ~sep:"\n" |> print_endline;
-    check_rows
-    |> List.exists ~f:(fun row -> 
-        let res = 
-            try
-                let _ =  Str.search_forward (Str.regexp "[^0-9\\.]") row 0 in
-                true
-            with _ -> false
-        in
-        (* let res = Str.string_partial_match (Str.regexp "[^0-9\\.]") row 0 in *)
-        (* Printf.printf "%s -> %b\n" row res; *)
-        res 
-    )
-;;
+    let symbols = 
+        Aoc.read_lines file
+        |> List.concat_mapi ~f:(fun y line ->
+            match_all "[^0-9\\.]+" line
+            |> List.map ~f:(fun (s, x, _) -> s, (x, y))
+        ) 
+    in
+    numbers, symbols
+;; 
 
 
 let part1 file = 
-    let schema = Aoc.read_lines file |> List.to_array in
-    schema 
-    |> Array.concat_mapi ~f:(fun idx line ->
-        match_all "[0-9]+" line 
-        |> List.filter ~f:(fun found_number -> 
-            has_adjacent_symbols schema idx found_number 
+    let numbers, symbols = parse file in
+    numbers
+        |> List.filter ~f:(fun (_, rect) ->
+            List.exists symbols ~f:(fun (_, point) -> belongs point rect)
         )
-        |> List.map ~f:(fun (n, _, _) -> Int.of_string n)
-        |> List.to_array
-    )
-    |> Array.fold ~init:0 ~f:( + )
-    |> Int.to_string 
+        |> List.fold ~init:0 ~f:(fun acc (n, _) -> acc + n)
+        |> Int.to_string
 ;;
 
 
+let part2 file = 
+    let numbers, symbols = parse file in
+    symbols
+        |> List.filter ~f:(fun (s, _) -> String.equal s "*")
+        |> List.map ~f:snd
+        |> List.fold ~init:0 ~f:(fun acc (x, y) ->
+            let adj_numbers = numbers 
+                |> List.filter ~f:(fun (_, rect) -> belongs (x,y) rect )
+                |> List.map ~f:fst
+            in
+            match adj_numbers with
+            | [a; b] -> acc + (a * b)
+            | _ -> acc
+        )
+        |> Int.to_string
+;;
 
-
-let part2 file = "foo"
 
 
 let () = 
     Printf.printf "part1 example: %s\n" (part1 "day03/input.example.txt");
     Printf.printf "part1: %s\n" (part1 "day03/input.txt");
-    (* Printf.printf "part2 example: %s\n" (part2 "day03/input.example.txt"); *)
-    (* Printf.printf "part2: %s\n" (part2 "day03/input.txt"); *)
+    Printf.printf "part2 example: %s\n" (part2 "day03/input.example.txt");
+    Printf.printf "part2: %s\n" (part2 "day03/input.txt");
     ();
 
