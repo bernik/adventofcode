@@ -12,11 +12,25 @@ let parse file =
     )
 ;;
 
-let find_times_count max_time distance = 
-    List.range ~stop:`inclusive 0 max_time 
-    |> List.filter ~f:(fun time -> (max_time - time) * time > distance)
-    |> List.length
-;;
+
+let rec find_times_count max_time distance =
+    let mid a b = 
+        let d = b - a in
+        if Int.is_positive (d % 2) 
+        then a + d / 2 + 1
+        else a + d / 2 
+    in
+    let rec binsearch a b = 
+        if b - a <= 1 
+        then max_time + 1 - (b * 2) 
+        else 
+            let m = mid a b in
+            if (max_time - m) * m > distance 
+            then binsearch a m
+            else binsearch m b
+    in 
+    binsearch 0 max_time
+;; 
 
 
 let part1 file = 
