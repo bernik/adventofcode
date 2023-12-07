@@ -46,7 +46,18 @@ let freqs lst =
 
 
 let hand_type hand = 
-    let xs = freqs hand |> List.map ~f:snd in
+    let jokers = match freqs hand |> List.find ~f:(fun (c, _) -> c = 1) with
+        | Some (_, n) -> n
+        | None -> 0
+    in
+    let xs = freqs hand 
+        |> List.filter ~f:(fun (c, _) -> c <> 1)
+        |> List.mapi ~f:(fun idx (_, n) ->
+            if idx = 0
+            then n + jokers
+            else n
+        ) 
+    in
     match xs with 
     | [5] -> 6
     | [4;1] -> 5
@@ -54,6 +65,7 @@ let hand_type hand =
     | [3;1;1] -> 3
     | [2;2;1] -> 2
     | [2;1;1;1] -> 1
+    | [] -> 1 + jokers
     | _ -> 0
 ;;
 
@@ -68,8 +80,8 @@ let rec higher_card hand1 hand2 =
 
 
 
-let part1 file = 
-    parse file
+let solve hands = 
+    hands
     |> List.sort ~compare:(fun (hand1, _) (hand2, _) -> 
         let t1 = hand_type hand1 in
         let t2 = hand_type hand2 in
@@ -78,25 +90,28 @@ let part1 file =
         then higher_card hand1 hand2 
         else r
     )
-    |> List.map ~f:(fun (hand, bid as x) ->
-        (* print_endline "hand"; *)
-        (* print_int_list hand; *)
-        (* pf "bid: %d\n" bid; *)
-        x
-    )
     |> List.mapi ~f:(fun rank (_, bid) -> (rank + 1) * bid)
     |> List.reduce_exn ~f:( + )
     |> Int.to_string
 ;;
 
-
-let part2 file = "part2";;
+let part1 file = parse file |> solve;;
+let part2 file = parse file 
+    |> List.map ~f:(fun (hand, bid) -> 
+        let with_jokers = List.map hand ~f:(fun n -> 
+            if n = 11 then 1 else n
+        ) 
+        in
+        with_jokers, bid
+    )
+    |> solve
+;;
 
 
 let () = 
     pf "part1 example: %s\n" (part1 "day07/input.example.txt");
     pf "part1: %s\n"         (part1 "day07/input.txt");
-    (* pf "part2 example: %s\n" (part2 "day07/input.example.txt"); *)
-    (* pf "part2: %s\n"         (part2 "day07/input.txt"); *)
+    pf "part2 example: %s\n" (part2 "day07/input.example.txt");
+    pf "part2: %s\n"         (part2 "day07/input.txt");
     ();
 
