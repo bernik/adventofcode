@@ -1,0 +1,5 @@
+(executable 
+    (name day16)
+    (public_name day16)
+    (libraries aoc base str)
+    (preprocess (pps ppx_jane)))
