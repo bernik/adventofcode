@@ -79,8 +79,7 @@ let print_tiles tiles visited =
 ;;
 
 
-let solve file start =
-    let tiles = parse file in
+let solve tiles start =
     let visited = Set.empty (module Beam) in
     let rec aux queue visited = 
         match queue with
@@ -106,10 +105,25 @@ let solve file start =
 
 let part1 file = 
     let start = "right", 0, 0 in
-    solve file start |> Int.to_string
+    let tiles = parse file in
+    solve tiles start |> Int.to_string
 ;;
 
-let part2 file = "part2";;
+let part2 file = 
+    let tiles = parse file in
+    let height = Array.length tiles in
+    let width = Array.length tiles.(0) in
+    List.concat [
+        List.range 0 height |> List.map ~f:(fun row -> "right", row, 0);
+        List.range 0 height |> List.map ~f:(fun row -> "left", row, width-1);
+        List.range 0 width |> List.map ~f:(fun col -> "down", 0, col);
+        List.range 0 width |> List.map ~f:(fun col -> "up", height-1, col);
+    ]
+    |> List.fold ~init:0 ~f:(fun acc start -> 
+        Int.max acc (solve tiles start) 
+    )
+    |> Int.to_string
+;;
 
 
 let () = 
