@@ -1,5 +1,5 @@
-open Core 
-
+open Base 
+open Stdio
 
 let match_all pattern s = 
     let re = Str.regexp pattern in 
@@ -23,7 +23,7 @@ let belongs point rect =
 
 let parse file = 
     let numbers = 
-        Aoc.read_lines file
+        In_channel.read_lines file
         |> List.concat_mapi ~f:(fun y line ->
             match_all "[0-9]+" line
             |> List.map ~f:(fun (number, x1, x2) ->  
@@ -32,7 +32,7 @@ let parse file =
         ) 
     in
     let symbols = 
-        Aoc.read_lines file
+        In_channel.read_lines file
         |> List.concat_mapi ~f:(fun y line ->
             match_all "[^0-9\\.]+" line
             |> List.map ~f:(fun (s, x, _) -> s, (x, y))
@@ -73,9 +73,9 @@ let part2 file =
 
 
 let () = 
-    Printf.printf "part1 example: %s\n" (part1 "day03/input.example.txt");
-    Printf.printf "part1: %s\n" (part1 "day03/input.txt");
-    Printf.printf "part2 example: %s\n" (part2 "day03/input.example.txt");
-    Printf.printf "part2: %s\n" (part2 "day03/input.txt");
+    printf "part1 example: %s\n" (part1 "day03/input.example.txt");
+    printf "part1: %s\n" (part1 "day03/input.txt");
+    printf "part2 example: %s\n" (part2 "day03/input.example.txt");
+    printf "part2: %s\n" (part2 "day03/input.txt");
     ();
 

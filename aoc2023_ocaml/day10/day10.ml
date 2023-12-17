@@ -1,12 +1,13 @@
-open Core 
-open Aoc
+open Base 
+open Stdio
 
 module Coords = struct
-    include Tuple.Make (Int) (Int)
-    include Tuple.Hashable (Int) (Int)
-    include Tuple.Comparable (Int) (Int)
-
-    let print (row, col) = pf "(%d, %d)\n" row col
+    module T = struct 
+        type t = int * int 
+        [@@deriving compare, sexp_of]
+    end
+    include T
+    include Comparator.Make(T)
 end
 
 
@@ -64,7 +65,6 @@ let detect_start m (row, col) =
     let west = row, col-1 in
     let east = row, col+1 in
     match m.(row).(col) with 
-    (* | 'S' -> [] *)
     | 'F' -> [south; east]
     | '|' -> [north; south]
     | '-' -> [west; east]
@@ -75,56 +75,60 @@ let detect_start m (row, col) =
 ;;
 
 
-let print_q q = 
-    print_endline "queue:";
-    List.iter q ~f:(fun (row, col) -> pf "(%d, %d)\n" row col)
-;;
-
-
-let print_visited visited = 
-    print_endline "visited:";
-    Hashtbl.to_alist visited
-    |> List.sort ~compare:(fun (_, v1) (_, v2) -> Int.compare v1 v2 )
-    |> List.iter ~f:(fun ((row, col), v) -> 
-        pf "(%d, %d) => %d\n" row col v
-    ) 
-;;
-
-
-let bfs m start = 
-    let visited = Hashtbl.create (module Coords) in
-    let rec aux q n = 
-        match q with
-        | [] -> Hashtbl.data visited |> List.reduce_exn ~f:Int.max
+let bfs tiles start = 
+    let visited = Set.empty (module Coords) in
+    let rec aux queue visited = 
+        match queue with
+        | [] -> visited
         | _ -> 
-            List.iter q ~f:(fun key -> Hashtbl.set visited ~key ~data:n);
-            let xs = q
-                |> List.concat_map ~f:(next_coords m) 
-                |> List.filter ~f:(fun x -> not @@ Hashtbl.mem visited x )
+            let visited' = List.fold queue 
+                ~init:visited 
+                ~f:(fun acc x -> Set.add acc x) 
+            in
+            let queue' = queue
+                |> List.concat_map ~f:(next_coords tiles) 
+                |> List.filter ~f:(fun x -> not @@ Set.mem visited' x )
             in 
-            aux xs (n+1)
+            aux queue' visited' 
     in 
-    let res = aux [start] 0 in
-    res
+    aux [start] visited 
 ;;
 
 
 
 let part1 file = 
-    let m = parse file in 
-    let (start_row, start_col as start) = find_start m in
-    m.(start_row).(start_col) <- detect_start m start;
-    bfs m start |> Int.to_string
+    let tiles = parse file in 
+    let (start_row, start_col as start) = find_start tiles in
+    tiles.(start_row).(start_col) <- detect_start tiles start;
+    let pipe = bfs tiles start |> Set.length in
+    (pipe / 2) |> Int.to_string
 ;;
 
-let part2 file = "part2";;
+
+let part2 file = 
+    let tiles = parse file in
+    let height = Array.length tiles in
+    let width = Array.length tiles.(0) in
+    let (start_row, start_col as start) = find_start tiles in
+    tiles.(start_row).(start_col) <- detect_start tiles start;
+    let pipe = bfs tiles start in
+    List.cartesian_product (List.range 0 height) (List.range 0 width)
+    |> List.filter ~f:(fun x -> not @@ Set.mem pipe x )
+    |> List.filter ~f:(fun (row, col) -> 
+        let a, b = Set.filter pipe ~f:(fun (r, _) -> r = row)
+        |> Set.fold ~init:(0,0) ~f:(fun (a, b) (p_row, p_col) -> 
+            a,b
+        )
+    )
+
+;;
 
 
 let () = 
-    pf "part1 example: %s\n" (part1 "day10/input.example.txt");
-    pf "part1 example2: %s\n" (part1 "day10/input.example2.txt");
-    pf "part1: %s\n"         (part1 "day10/input.txt");
-    (* pf "part2 example: %s\n" (part2 "day10/input.example.txt"); *)
-    (* pf "part2: %s\n"         (part2 "day10/input.txt"); *)
+    printf "part1 example: %s\n" (part1 "day10/input.example.txt");
+    printf "part1 example2: %s\n" (part1 "day10/input.example2.txt");
+    printf "part1: %s\n"         (part1 "day10/input.txt");
+    (* printf "part2 example: %s\n" (part2 "day10/input.example.txt"); *)
+    (* printf "part2: %s\n"         (part2 "day10/input.txt"); *)
     ();
 

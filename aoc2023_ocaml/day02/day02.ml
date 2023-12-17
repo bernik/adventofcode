@@ -1,4 +1,5 @@
-open Core 
+open Base 
+open Stdio
 
 
 let split2 ~on s =
@@ -18,11 +19,11 @@ let parse_line line =
             |> List.map ~f:String.strip 
             |> List.map ~f:(fun x -> 
                 let n, c = split2 ~on:' ' x in
-                c, (int_of_string n) 
+                c, (Int.of_string n) 
             ) 
         )  
     in
-    int_of_string game_id, buckets
+    Int.of_string game_id, buckets
 
 
 let is_valid_bucket = 
@@ -39,17 +40,17 @@ let is_valid_game = List.for_all ~f:is_valid_bucket
 
 
 let part1 file = 
-    Aoc.read_lines file
+    In_channel.read_lines file
     |> List.map ~f:parse_line
     |> List.filter ~f:(fun x -> x |> snd |> is_valid_game)
     |> List.map ~f:fst
     |> List.fold_left ~init:0 ~f:(+) 
-    |> string_of_int
+    |> Int.to_string
 
 
 
 let part2 file = 
-    Aoc.read_lines file 
+    In_channel.read_lines file 
     |> List.map ~f:parse_line
     |> List.map ~f:snd
     |> List.map ~f:(fun buckets -> 
@@ -65,13 +66,13 @@ let part2 file =
         (red * blue * green)
     )
     |> List.fold ~init:0 ~f:( + )
-    |> string_of_int
+    |> Int.to_string
 
 
 
 let () = 
-    Printf.printf "part1 example: %s\n" (part1 "day02/input.example.txt");
-    Printf.printf "part1: %s\n" (part1 "day02/input.txt");
-    Printf.printf "part2 example: %s\n" (part2 "day02/input.example.txt");
-    Printf.printf "part2: %s\n" (part2 "day02/input.txt");
+    printf "part1 example: %s\n" (part1 "day02/input.example.txt");
+    printf "part1: %s\n" (part1 "day02/input.txt");
+    printf "part2 example: %s\n" (part2 "day02/input.example.txt");
+    printf "part2: %s\n" (part2 "day02/input.txt");
 

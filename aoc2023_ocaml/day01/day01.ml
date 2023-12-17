@@ -1,3 +1,5 @@
+open Stdio
+
 let parse_line pattern line = 
     let pattern = Str.regexp pattern in 
     let rec numbers acc start = 
@@ -27,7 +29,7 @@ let parse_line pattern line =
 
 let part1 file = 
     "day01/" ^ file 
-    |> Aoc.read_lines 
+    |> In_channel.read_lines 
     |> List.map (parse_line "[0-9]") 
     |> List.fold_left (+) 0
 
@@ -37,15 +39,15 @@ let part2 file =
         |> String.concat "\\|"
     in
     "day01/" ^ file 
-    |> Aoc.read_lines 
+    |> In_channel.read_lines 
     |> List.map (parse_line pattern) 
     |> List.fold_left (+) 0
 
 
 
 let () = 
-    Printf.printf "part1: %d \n" (part1 "input.example.txt");
-    Printf.printf "part1: %d \n" (part1 "input.txt");
-    Printf.printf "part2: %d \n" (part2 "input.example2.txt");
-    Printf.printf "part2: %d \n" (part2 "input.txt");
+    printf "part1: %d \n" (part1 "input.example.txt");
+    printf "part1: %d \n" (part1 "input.txt");
+    printf "part2: %d \n" (part2 "input.example2.txt");
+    printf "part2: %d \n" (part2 "input.txt");
 

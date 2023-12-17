@@ -1,4 +1,4 @@
 (executable 
     (name day03)
     (public_name day03)
-    (libraries aoc core str))
+    (libraries aoc))

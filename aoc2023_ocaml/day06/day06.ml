@@ -1,5 +1,5 @@
-open Core 
-open Aoc
+open Base 
+open Stdio
 
 
 let parse file = 
@@ -48,9 +48,9 @@ let part2 file =
 ;;
 
 let () = 
-    pf "part1 example: %s\n" (part1 "day06/input.example.txt");
-    pf "part1: %s\n"         (part1 "day06/input.txt");
-    pf "part2 example: %s\n" (part2 "day06/input.example.txt");
-    pf "part2: %s\n"         (part2 "day06/input.txt");
+    printf "part1 example: %s\n" (part1 "day06/input.example.txt");
+    printf "part1: %s\n"         (part1 "day06/input.txt");
+    printf "part2 example: %s\n" (part2 "day06/input.example.txt");
+    printf "part2: %s\n"         (part2 "day06/input.txt");
     ();
 

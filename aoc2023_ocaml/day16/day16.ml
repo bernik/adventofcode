@@ -1,8 +1,8 @@
 open Base 
-open Aoc
+open Stdio
 
 let parse file =
-    Stdio.In_channel.read_lines file
+    In_channel.read_lines file
     |> List.to_array 
     |> Array.map ~f:String.to_array
 ;;
@@ -127,9 +127,9 @@ let part2 file =
 
 
 let () = 
-    pf "part1 example: %s\n" (part1 "day16/input.example.txt");
-    pf "part1: %s\n"         (part1 "day16/input.txt");
-    pf "part2 example: %s\n" (part2 "day16/input.example.txt");
-    pf "part2: %s\n"         (part2 "day16/input.txt");
+    printf "part1 example: %s\n" (part1 "day16/input.example.txt");
+    printf "part1: %s\n"         (part1 "day16/input.txt");
+    printf "part2 example: %s\n" (part2 "day16/input.example.txt");
+    printf "part2: %s\n"         (part2 "day16/input.txt");
     ();
 

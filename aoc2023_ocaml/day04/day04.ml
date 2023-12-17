@@ -1,27 +1,9 @@
-open Core 
+open Base 
+open Stdio
 
-(* utils *)
-
-let pf = Printf.printf;;
-
-let print_int_list lst =
-    lst
-    |> List.map ~f:Int.to_string
-    |> String.concat ~sep:", "
-    |> pf "(%s)\n"
-;;
-let print_int_arr arr =
-    arr
-    |> Array.to_list
-    |> List.mapi ~f:(fun idx n -> Printf.sprintf "%d => %d" idx n)
-    |> String.concat ~sep:", \n"
-    |> pf "(%s)\n"
-;;
-
-(* solution *)
 
 let parse file =     
-    Aoc.read_lines file
+    In_channel.read_lines file
     |> List.map ~f:(Str.split (Str.regexp "[\\:\\|]"))
     |> List.map ~f:(fun x -> 
         match x with 
@@ -69,9 +51,9 @@ let part2 file =
 
 
 let () = 
-    pf "part1 example: %s\n" (part1 "day04/input.example.txt");
-    pf "part1: %s\n"         (part1 "day04/input.txt");
-    pf "part2 example: %s\n" (part2 "day04/input.example.txt");
-    pf "part2: %s\n"         (part2 "day04/input.txt");
+    printf "part1 example: %s\n" (part1 "day04/input.example.txt");
+    printf "part1: %s\n"         (part1 "day04/input.txt");
+    printf "part2 example: %s\n" (part2 "day04/input.example.txt");
+    printf "part2: %s\n"         (part2 "day04/input.txt");
     ();
 
