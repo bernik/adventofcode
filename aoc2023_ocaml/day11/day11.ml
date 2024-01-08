@@ -41,6 +41,7 @@ let rec permutations = function
         let xs = List.map tl ~f:(fun y -> x, y) in
         xs @ permutations tl
 
+
 let solve file ~n =
     let tiles = parse file in
     let exp_rows = expanded_rows tiles in
@@ -49,19 +50,19 @@ let solve file ~n =
     let pairs = permutations galaxies in
     List.map pairs ~f:(fun ((row1, col1 as a), (row2, col2 as b)) -> 
         let dist = distance a b in 
-        let er_count = exp_rows
+        let empty_rows = exp_rows
             |> Array.filter ~f:(fun r -> 
                 Int.between r ~low:(Int.min row1 row2) ~high:(Int.max row1 row2)
             ) 
             |> Array.length
         in
-        let ec_count = exp_cols
+        let empty_columns = exp_cols
             |> Array.filter ~f:(fun c -> 
                 Int.between c ~low:(Int.min col1 col2) ~high:(Int.max col1 col2)
             ) 
             |> Array.length
         in
-        dist + (er_count * n) + (ec_count * n)
+        dist + (empty_rows * n) + (empty_columns * n)
     )
     |> List.reduce_exn ~f:(+)
     |> Int.to_string
@@ -69,13 +70,12 @@ let solve file ~n =
 
 
 let part1 = solve ~n:1;;
-let part2 file = "part2";;
-
+let part2 = solve ~n:(1000000-1);;
 
 
 let () = 
     printf "part1: %s \n" (part1 "day11/input.example.txt");
     printf "part1: %s \n" (part1 "day11/input.txt");
-    (* printf "part2: %s \n" (part2 "day11/input.example.txt"); *)
-    (* printf "part2: %s \n" (part2 "day11/input.txt"); *)
+    printf "part2: %s \n" (part2 "day11/input.example.txt");
+    printf "part2: %s \n" (part2 "day11/input.txt");
 
