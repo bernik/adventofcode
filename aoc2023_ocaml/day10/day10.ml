@@ -119,6 +119,8 @@ let part2 file =
         |> Set.fold ~init:(0,0) ~f:(fun (a, b) (p_row, p_col) -> 
             a,b
         )
+        in 
+        false
     )
 
 ;;

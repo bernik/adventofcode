@@ -73,29 +73,36 @@ let parse file ~part =
     in
     maps 
     |> List.rev
+    |> List.map ~f:(List.sort ~compare:(fun (a, _, _) (b, _, _) -> Int.compare a b))
     |> List.iteri ~f:(fun idx x -> 
-        print_endline ("map " ^ Int.to_string idx);
-        x 
-        |> List.sort ~compare:(fun (a, _, _) (b, _, _) -> Int.compare a b )
-        |> List.iter  ~f:(fun (a,b,c) ->
-            printf "(%d, %d, %d)\n" a b c
-        )
+        (* print_endline ("map " ^ Int.to_string idx); *)
+        (* x  *)
+        (* |> List.iter  ~f:(fun (a,b,c) -> *)
+            (* printf "(%d, %d, %d)\n" a b c *)
+        (* ); *)
+        ()
     );
-    seeds, List.reduce_exn maps ~f:combine_maps 
+    (* seeds, List.reduce_exn maps ~f:combine_maps  *)
+    seeds, maps
 ;;
 
-let () = 
-    parse "day05/input.example.txt" ~part:1
-    |> snd
-    |> List.iter ~f:(fun (a,b,c) -> 
-        (* pf "(%d, %d, %d)\n" a b c *)
-        ()
-    )
+let convert = 
+    let aux res seeds map = 
+        match seeds, map with 
+        | _, [] -> res @ seeds
+        | [], _ -> res
+        | (a,b)::tl, (x,y,dx)::tl2 -> 
+            if a <= y && x <= b
+            then []
+            else []
+    in
+    aux [] 
 ;;
+
 
 let solve file ~part = 
-    let seeds, _ = parse file ~part in
-    seeds
+    let seeds, maps = parse file ~part in
+    List.fold maps ~init:seeds ~f:convert
     |> List.map ~f:fst
     |> List.sort ~compare:Int.compare
     |> List.hd_exn 
@@ -107,7 +114,7 @@ let part1 = solve ~part:1;;
 let part2 = solve ~part:2;;
 
 let () = 
-    (* printf "part1 example: %s\n" (part1 "day05/input.example.txt"); *)
+    printf "part1 example: %s\n" (part1 "day05/input.example.txt");
     (* printf "part1: %s\n"         (part1 "day05/input.txt"); *)
     (* printf "part2 example: %s\n" (part2 "day05/input.example.txt"); *)
     (* printf "part2: %s\n"         (part2 "day05/input.txt"); *)
