@@ -22,7 +22,7 @@ fn part1(file) {
   let lefts = list.sort(lefts, by: int.compare)
   let rights = list.sort(rights, by: int.compare)
   list.map2(lefts, rights, fn(left, right) { int.absolute_value(left - right) })
-  |> list.fold(0, fn(acc, n) { acc + n })
+  |> list.fold(0, int.add)
   |> int.to_string
 }
 
@@ -30,7 +30,7 @@ fn part2(file) {
   let #(lefts, rights) = parse_lines(file)
   lefts
   |> list.map(fn(l) { l * list.count(rights, fn(r) { r == l }) })
-  |> list.fold(0, fn(acc, n) { acc + n })
+  |> list.fold(0, int.add)
   |> int.to_string
 }
 
