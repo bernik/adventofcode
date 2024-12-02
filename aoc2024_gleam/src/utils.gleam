@@ -1,10 +1,11 @@
 import gleam/int
+import gleam/list
 import gleam/string
 import simplifile
 
 pub fn read_lines(path) -> List(String) {
   let assert Ok(content) = simplifile.read(path)
-  string.split(content, on: "\n")
+  content |> string.trim |> string.split(on: "\n") |> list.map(string.trim)
 }
 
 pub fn string_to_int(s) {
