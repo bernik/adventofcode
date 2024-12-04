@@ -12,7 +12,7 @@ fn parse_lines(file) {
     let assert [l, r] = split(line, with: whitespace)
     #(string_to_int(l), string_to_int(r))
   })
-  |> list.fold(#([], []), fn(acc: #(List(Int), List(Int)), pair) {
+  |> list.fold(#([], []), fn(acc, pair) {
     #([pair.0, ..acc.0], [pair.1, ..acc.1])
   })
 }
