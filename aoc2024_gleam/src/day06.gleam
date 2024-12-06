@@ -82,13 +82,16 @@ fn part2(file) {
   let assert Ok(visited) = find_path(start, Up, set.new(), map)
   visited
   |> set.map(pair.first)
-  |> set.to_list
-  |> list.filter(fn(pos) { dict.get(map, pos) |> result.unwrap("") == "." })
-  |> list.filter(fn(pos) {
-    find_path(start, Up, set.new(), dict.insert(map, pos, "#"))
-    |> result.is_error
+  |> set.filter(fn(pos) {
+    case dict.get(map, pos) {
+      Ok(".") -> {
+        find_path(start, Up, set.new(), dict.insert(map, pos, "#"))
+        |> result.is_error
+      }
+      _ -> False
+    }
   })
-  |> list.length
+  |> set.size
   |> int.to_string
 }
 
