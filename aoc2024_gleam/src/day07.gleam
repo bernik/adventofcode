@@ -76,6 +76,6 @@ pub fn main() {
   let part1 = solve(file, False)
   let part2 = solve(file, True)
 
-  io.println("Day 06 | Part 1: " <> part1)
-  io.println("Day 06 | Part 2: " <> part2)
+  io.println("Day 07 | Part 1: " <> part1)
+  io.println("Day 07 | Part 2: " <> part2)
 }
