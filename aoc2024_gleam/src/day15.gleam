@@ -201,7 +201,6 @@ fn solve(file, expanded) {
   let start = find_start(map)
 
   do_solve(map |> dict.insert(start, "."), moves, start)
-  |> print_map(#(0, 0))
   |> dict.filter(fn(_, v) { v == "O" || v == "[" })
   |> dict.keys
   |> list.fold(0, fn(acc, x) { acc + 100 * x.0 + x.1 })
