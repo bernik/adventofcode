@@ -1,4 +1,5 @@
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/string
 import simplifile
@@ -11,4 +12,8 @@ pub fn read_lines(path) -> List(String) {
 pub fn string_to_int(s) {
   let assert Ok(n) = int.parse(s)
   n
+}
+
+pub fn clear_screen() {
+  io.print("\u{001b}[2J")
 }
