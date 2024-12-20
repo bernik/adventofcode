@@ -3,11 +3,8 @@ import gleam/int
 import gleam/io
 import gleam/list
 import gleam/option.{Some}
-import gleam/pair
-import gleam/result
 import gleam/set
 import gleam/string
-import pprint.{debug as d}
 import utils
 
 fn parse_input(file) {
@@ -42,7 +39,7 @@ fn neighbours(map, node: #(Int, Int)) {
   })
 }
 
-fn do_distances(map, queue, visited, res) {
+fn all_distances(map, queue, visited, res) {
   case queue {
     [] -> res
     [x, ..queue] -> {
@@ -64,7 +61,7 @@ fn do_distances(map, queue, visited, res) {
           })
         })
 
-      do_distances(
+      all_distances(
         map,
         list.append(queue, neighbours),
         set.insert(visited, x),
@@ -74,80 +71,49 @@ fn do_distances(map, queue, visited, res) {
   }
 }
 
-fn distance(map, start, end) {
-  let assert Ok(d) =
-    do_distances(map, [start], set.new(), dict.from_list([#(start, 0)]))
-    |> dict.get(end)
-
-  d
-}
-
 fn manhattan(a: #(Int, Int), b: #(Int, Int)) -> Int {
   int.absolute_value(a.0 - b.0) + int.absolute_value(a.1 - b.1)
 }
 
-fn cheats(map: dict.Dict(#(Int, Int), String), length: Int) {
+fn cheats(map, length) {
   map
-  |> dict.filter(fn(_, v) { v != "#" })
+  |> dict.filter(fn(_, v) { v == "." || v == "E" || v == "S" })
   |> dict.keys
-  |> list.flat_map(fn(x) {
-    [#(0, 1), #(0, -1), #(1, 0), #(-1, 0)]
-    |> list.map(fn(y) {
-      let one = #(x.0 + y.0, x.1 + y.1)
-      let two = #(one.0 + y.0, one.1 + y.1)
+  |> list.combination_pairs
+  |> list.filter(fn(pair) {
+    let #(a, b) = pair
+    let m = manhattan(a, b)
 
-      #(one, two)
-    })
+    2 <= m && m <= length
   })
-  |> list.filter_map(fn(cheat) {
-    case dict.get(map, cheat.0), dict.get(map, cheat.1) {
-      Ok("#"), Ok(v) if v != "#" -> Ok(cheat.0)
-      _, _ -> Error(Nil)
-    }
-  })
-  |> list.unique
 }
 
-fn part1(file) {
+fn solve(file, cheats_length, save_threshold) {
   let map = parse_input(file)
   let start = find_node(map, "S")
-  let end = find_node(map, "E")
-
-  let base = distance(map, start, end)
-  let save = 100
-
-  let cheats = cheats(map, 2)
-  let cheats_length = list.length(cheats)
+  let cheats = cheats(map, cheats_length)
+  let distances =
+    all_distances(map, [start], set.new(), dict.from_list([#(start, 0)]))
 
   cheats
-  |> list.index_fold(0, fn(total, cheat, index) {
-    // d(#(index, cheats_length))
-    let dist =
-      map
-      |> dict.insert(cheat, ".")
-      |> distance(start, end)
+  |> list.filter(fn(cheat) {
+    let #(a, b) = cheat
+    let m = manhattan(a, b)
+    let assert Ok(av) = dict.get(distances, a)
+    let assert Ok(bv) = dict.get(distances, b)
 
-    case { base - dist } >= save {
-      True -> total + 1
-      _ -> total
-    }
+    let save = int.absolute_value(bv - av) - m
+
+    save >= save_threshold
   })
-  // |> list.length
+  |> list.length
   |> int.to_string
 }
 
-fn part2(file) {
-  "todo"
-}
-
 pub fn main() {
-  // let assert "todo" = part1("./resources/day20.example.txt")
-  // let assert "todo" = part2("./resources/day20.example.txt")
-
-  // let _ = part1("./resources/day20.example.txt")
   let file = "./resources/day20.input.txt"
-  let part1 = part1(file)
-  // let part2 = part2(file)
+  let part1 = solve(file, 2, 100)
+  let part2 = solve(file, 20, 100)
   io.println("Day 20 | Part 1: " <> part1)
-  // io.println("Day 20 | Part 2: " <> part2)
+  io.println("Day 20 | Part 2: " <> part2)
 }
