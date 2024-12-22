@@ -1,6 +1,8 @@
+import gleam/dict
 import gleam/int
 import gleam/io
 import gleam/list
+import gleam/option
 import gleam/result
 import gleam/yielder
 import utils
@@ -43,15 +45,46 @@ fn part1(file) {
   |> int.to_string
 }
 
+fn seqs(n, lenght) {
+  yielder.iterate(n, next_number)
+  |> yielder.map(fn(n) { n % 10 })
+  |> yielder.take(lenght)
+  |> yielder.to_list
+  |> list.window(5)
+  |> list.fold(dict.new(), fn(acc, w) {
+    let seq = w |> list.window_by_2 |> list.map(fn(w) { w.1 - w.0 })
+    let value = list.last(w) |> result.unwrap(0)
+
+    acc
+    |> dict.upsert(seq, fn(x) {
+      case x {
+        option.Some(v) -> v
+        option.None -> value
+      }
+    })
+  })
+  |> dict.to_list
+}
+
 fn part2(file) {
-  "todo"
+  utils.read_lines(file)
+  |> list.map(utils.string_to_int)
+  |> list.flat_map(seqs(_, 2001))
+  |> list.fold(dict.new(), fn(acc, x) {
+    let #(seq, v) = x
+    acc
+    |> dict.upsert(seq, fn(vv) { vv |> option.unwrap(0) |> int.add(v) })
+  })
+  |> dict.values
+  |> list.sort(int.compare)
+  |> list.last
+  |> result.unwrap(0)
+  |> int.to_string
 }
 
 pub fn main() {
-  // let assert "126384" = part1("./resources/day22.example.txt")
-
-  let file = "./resources/day22.input.txt"
   // let file = "./resources/day22.example.txt"
+  let file = "./resources/day22.input.txt"
   let part1 = part1(file)
   io.println("Day 22 | Part 1: " <> part1)
 
