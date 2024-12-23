@@ -4,9 +4,9 @@ import gleam/io
 import gleam/list
 import gleam/order
 import gleam/pair
+import gleam/result
 import gleam/set
 import gleam/string
-import pprint
 import utils
 
 fn parse_lines(file) {
@@ -55,13 +55,57 @@ fn part1(file) {
   |> int.to_string
 }
 
+fn bron_kerbosch(r, p, x, g) {
+  case set.is_empty(p) && set.is_empty(x) {
+    True -> [r]
+    _ -> {
+      list.fold(set.to_list(p), [], fn(acc, v) {
+        let nodes = dict.get(g, v) |> result.unwrap(set.new())
+        acc
+        |> list.append(bron_kerbosch(
+          set.insert(r, v),
+          set.intersection(p, nodes),
+          set.intersection(x, nodes),
+          g,
+        ))
+      })
+    }
+  }
+}
+
 fn part2(file) {
-  "todo"
+  let lines = parse_lines(file)
+
+  let all_conns =
+    dict.merge(list.group(lines, pair.first), list.group(lines, pair.second))
+    |> dict.map_values(fn(k, v) {
+      list.map(v, fn(x) {
+        case x {
+          #(a, b) if a == k -> b
+          #(a, b) if b == k -> a
+          _ -> panic as "huh"
+        }
+      })
+      |> set.from_list
+    })
+
+  bron_kerbosch(
+    set.new(),
+    dict.keys(all_conns) |> set.from_list,
+    set.new(),
+    all_conns,
+  )
+  |> list.sort(fn(a, b) { int.compare(set.size(a), set.size(b)) })
+  |> list.last
+  |> result.unwrap(set.new())
+  |> set.to_list
+  |> list.sort(string.compare)
+  |> string.join(",")
 }
 
 pub fn main() {
-  let file = "./resources/day23.example.txt"
-  // let file = "./resources/day23.input.txt"
+  // let file = "./resources/day23.example.txt"
+  let file = "./resources/day23.input.txt"
   let part1 = part1(file)
   let part2 = part2(file)
 
