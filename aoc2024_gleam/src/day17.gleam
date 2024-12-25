@@ -5,7 +5,6 @@ import gleam/list
 import gleam/regexp
 import gleam/result
 import gleam/string
-import pprint.{debug as d}
 import simplifile
 import utils
 

@@ -1,13 +1,10 @@
 import gleam/dict
-import gleam/erlang/process
 import gleam/int
 import gleam/io
 import gleam/list
 import gleam/option.{Some}
-import gleam/pair
 import gleam/set
 import gleam/string
-import pprint.{debug as d}
 import utils
 
 type Pos =
@@ -103,27 +100,28 @@ fn do_best_score(
   }
 }
 
-fn print_map(map: Map, visited: set.Set(Pos)) -> Nil {
-  let height = map |> dict.keys |> list.map(pair.first) |> list.fold(0, int.max)
-  let width = map |> dict.keys |> list.map(pair.second) |> list.fold(0, int.max)
+/// for debug
+// fn print_map(map: Map, visited: set.Set(Pos)) -> Nil {
+//   let height = map |> dict.keys |> list.map(pair.first) |> list.fold(0, int.max)
+//   let width = map |> dict.keys |> list.map(pair.second) |> list.fold(0, int.max)
 
-  list.range(0, height)
-  |> list.each(fn(row) {
-    list.range(0, width)
-    |> list.map(fn(col) {
-      case set.contains(visited, #(row, col)) {
-        True -> "0"
-        False ->
-          case dict.get(map, #(row, col)) {
-            Ok(v) -> v
-            _ -> " "
-          }
-      }
-    })
-    |> string.concat
-    |> io.println
-  })
-}
+//   list.range(0, height)
+//   |> list.each(fn(row) {
+//     list.range(0, width)
+//     |> list.map(fn(col) {
+//       case set.contains(visited, #(row, col)) {
+//         True -> "0"
+//         False ->
+//           case dict.get(map, #(row, col)) {
+//             Ok(v) -> v
+//             _ -> " "
+//           }
+//       }
+//     })
+//     |> string.concat
+//     |> io.println
+//   })
+// }
 
 fn best_score(map: Map) -> Int {
   let start = find_node(map, "S")

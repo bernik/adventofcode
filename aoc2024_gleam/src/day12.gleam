@@ -2,10 +2,8 @@ import gleam/dict
 import gleam/int
 import gleam/io
 import gleam/list
-import gleam/result
 import gleam/set
 import gleam/string
-import pprint
 import utils.{read_lines}
 
 fn parse_input(file) {
@@ -79,16 +77,16 @@ fn perimeter(map, region) {
   * 2
 }
 
-/// debug(regions, map)
-fn print_regions(regions, map) {
-  regions
-  |> list.map(fn(region) {
-    let label =
-      region |> list.map(dict.get(map, _)) |> result.values |> list.unique
-    #(label, list.length(region))
-  })
-  |> pprint.debug
-}
+/// for debug(regions, map)
+// fn print_regions(regions, map) {
+//   regions
+//   |> list.map(fn(region) {
+//     let label =
+//       region |> list.map(dict.get(map, _)) |> result.values |> list.unique
+//     #(label, list.length(region))
+//   })
+//   |> pprint.debug
+// }
 
 fn solve(file, price) {
   let map = parse_input(file)

@@ -7,7 +7,6 @@ import gleam/order
 import gleam/result
 import gleam/set
 import gleam/string
-import pprint.{debug as d}
 import utils
 
 fn parse_input(file) {
@@ -76,26 +75,27 @@ fn shortest_path(corrupted, queue, dists, visited, size) {
   }
 }
 
-fn print_map(size, visited, corrupted) {
-  io.println(string.repeat("-", size))
-  list.range(0, size - 1)
-  |> list.each(fn(y) {
-    list.range(0, size - 1)
-    |> list.map(fn(x) {
-      case set.contains(visited, #(x, y)) {
-        True -> "0"
-        False ->
-          case set.contains(corrupted, #(x, y)) {
-            True -> "#"
-            False -> "."
-          }
-      }
-    })
-    |> string.concat
-    |> io.println
-  })
-  io.println(string.repeat("-", size))
-}
+/// for debug
+// fn print_map(size, visited, corrupted) {
+//   io.println(string.repeat("-", size))
+//   list.range(0, size - 1)
+//   |> list.each(fn(y) {
+//     list.range(0, size - 1)
+//     |> list.map(fn(x) {
+//       case set.contains(visited, #(x, y)) {
+//         True -> "0"
+//         False ->
+//           case set.contains(corrupted, #(x, y)) {
+//             True -> "#"
+//             False -> "."
+//           }
+//       }
+//     })
+//     |> string.concat
+//     |> io.println
+//   })
+//   io.println(string.repeat("-", size))
+// }
 
 fn part1(file, size, take) {
   let corrupted = parse_input(file) |> list.take(take) |> set.from_list

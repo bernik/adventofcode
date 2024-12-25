@@ -6,7 +6,6 @@ import gleam/regexp
 import gleam/result
 import gleam/set
 import gleam/string
-import pprint.{debug as d}
 import simplifile
 
 fn parse_input(file) {

@@ -20,27 +20,27 @@ fn parse_input(file) {
 }
 
 /// for debug
-fn print_map(map) {
-  let height =
-    map
-    |> dict.keys
-    |> list.map(pair.first(_))
-    |> list.reduce(int.max)
-    |> result.unwrap(0)
+// fn print_map(map) {
+//   let height =
+//     map
+//     |> dict.keys
+//     |> list.map(pair.first(_))
+//     |> list.reduce(int.max)
+//     |> result.unwrap(0)
 
-  list.range(0, height)
-  |> list.each(fn(row) {
-    map
-    |> dict.to_list
-    |> list.filter(fn(x) { x.0.0 == row })
-    |> list.sort(fn(a, b) { int.compare(a.0.1, b.0.1) })
-    |> list.map(pair.second)
-    |> string.concat
-    |> io.println
-  })
+//   list.range(0, height)
+//   |> list.each(fn(row) {
+//     map
+//     |> dict.to_list
+//     |> list.filter(fn(x) { x.0.0 == row })
+//     |> list.sort(fn(a, b) { int.compare(a.0.1, b.0.1) })
+//     |> list.map(pair.second)
+//     |> string.concat
+//     |> io.println
+//   })
 
-  map
-}
+//   map
+// }
 
 fn antennas(map) {
   map

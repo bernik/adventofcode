@@ -6,7 +6,6 @@ import gleam/option
 import gleam/regexp
 import gleam/string
 import gleam/yielder as y
-import pprint.{debug as d}
 import simplifile
 import utils
 

@@ -63,15 +63,16 @@ fn part1(file) {
   |> int.to_string
 }
 
-fn print_slots(slots) {
-  slots
-  |> list.each(fn(slot) {
-    case slot {
-      File(i, s) -> io.print(i |> int.to_string |> string.repeat(s))
-      Space(s) -> io.print(string.repeat(".", s))
-    }
-  })
-}
+/// for debug
+// fn print_slots(slots) {
+//   slots
+//   |> list.each(fn(slot) {
+//     case slot {
+//       File(i, s) -> io.print(i |> int.to_string |> string.repeat(s))
+//       Space(s) -> io.print(string.repeat(".", s))
+//     }
+//   })
+// }
 
 fn has_free_slot(slots, file, i) {
   case slots, file {

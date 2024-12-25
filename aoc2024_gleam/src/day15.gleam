@@ -2,7 +2,6 @@ import gleam/dict
 import gleam/int
 import gleam/io
 import gleam/list
-import gleam/pair
 import gleam/result
 import gleam/string
 import pprint.{debug as d}
@@ -175,26 +174,27 @@ fn do_solve(map, moves, cur) {
   }
 }
 
-fn print_map(map, cur) {
-  let h = map |> dict.keys |> list.map(pair.first) |> list.fold(0, int.max)
-  let w = map |> dict.keys |> list.map(pair.second) |> list.fold(0, int.max)
+/// for debug
+// fn print_map(map, cur) {
+//   let h = map |> dict.keys |> list.map(pair.first) |> list.fold(0, int.max)
+//   let w = map |> dict.keys |> list.map(pair.second) |> list.fold(0, int.max)
 
-  list.range(0, h)
-  |> list.each(fn(row) {
-    list.range(0, w)
-    |> list.map(fn(col) {
-      case #(row, col) == cur {
-        True -> Ok("@")
-        False -> dict.get(map, #(row, col))
-      }
-    })
-    |> result.values
-    |> string.concat
-    |> io.println
-  })
+//   list.range(0, h)
+//   |> list.each(fn(row) {
+//     list.range(0, w)
+//     |> list.map(fn(col) {
+//       case #(row, col) == cur {
+//         True -> Ok("@")
+//         False -> dict.get(map, #(row, col))
+//       }
+//     })
+//     |> result.values
+//     |> string.concat
+//     |> io.println
+//   })
 
-  map
-}
+//   map
+// }
 
 fn solve(file, expanded) {
   let #(map, moves) = parse_input(file, expanded)
