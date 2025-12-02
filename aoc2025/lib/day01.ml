@@ -27,6 +27,18 @@ let part1 file =
   result
 ;;
 
+let brute_force start steps dir =
+  let rec aux acc current steps =
+    if steps = 0
+    then acc
+    else (
+      let current' = (current + dir) mod 100 in
+      let acc' = acc + if current' = 0 then 1 else 0 in
+      aux acc' current' (steps - 1))
+  in
+  aux 0 start steps
+;;
+
 let part2 file =
   let lines = parse_input file in
   let _, result =
@@ -35,19 +47,11 @@ let part2 file =
          (fun (acc, res) (dir, n) ->
             let new_acc, cnt =
               match dir, n with
-              | 'R', n -> (acc + n) mod 100, (acc + n) / 100
+              | 'R', n -> (acc + n) mod 100, brute_force acc n 1
               | 'L', n when acc > n -> acc - n, 0
-              | 'L', n ->
-                ( (100 + acc - n) mod 100
-                , ((100 - acc + n) / 100) - if acc = 0 then 1 else 0 )
+              | 'L', n -> (100 + acc - n) mod 100, brute_force acc n (-1)
               | _ -> acc, n
             in
-            (* let res' = *)
-            (*   match new_acc with *)
-            (*   | 0 -> 1 *)
-            (*   | _ -> cnt *)
-            (* in *)
-            (* Fmt.pr "%c %d, acc: %d, res': %d\n" dir n new_acc res'; *)
             new_acc, res + cnt)
          (50, 0)
   in
