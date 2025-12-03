@@ -20,7 +20,17 @@ let day02 () =
     (Day02.part2 "resources/day02.input.txt")
 ;;
 
+let day03 () =
+  Fmt.pr
+    "day 03\n part 1: %d, %d\n part 2: %d, %d\n"
+    (Day03.part1 "resources/day03.example.txt")
+    (Day03.part1 "resources/day03.input.txt")
+    (Day03.part2 "resources/day03.example.txt")
+    (Day03.part2 "resources/day03.input.txt")
+;;
+
 let () =
   day01 ();
-  day02 ()
+  day02 ();
+  day03 ()
 ;;

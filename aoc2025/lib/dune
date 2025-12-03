@@ -1,4 +1,4 @@
 (library
- (modules utils day01 day02)
+ (modules utils day01 day02 day03)
  (name aoc2025)
  (libraries fmt str))
