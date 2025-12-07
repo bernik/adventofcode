@@ -1,9 +1,3 @@
-let rec transpose = function
-  | [] -> []
-  | [] :: xss -> transpose xss
-  | (x :: xs) :: xss -> List.((x :: map hd xss) :: transpose (xs :: map tl xss))
-;;
-
 let parse_input file =
   let lines = open_in file |> In_channel.input_lines in
   let len = List.length lines in
@@ -31,21 +25,14 @@ let part1 file =
 let part2 file =
   parse_input file
   |> List.map (fun (op, numbers) ->
-    (* Fmt.(pr "\nbefore: %a\n" (list ~sep:comma string)) numbers; *)
     let numbers' =
       op
       |> String.to_seq
       |> Seq.mapi (fun i _ ->
-        numbers
-        (* |> List.rev *)
-        |> List.map (fun s -> s.[i])
-        |> List.to_seq
-        |> String.of_seq
-        |> String.trim)
+        numbers |> List.map (fun s -> s.[i]) |> List.to_seq |> String.of_seq |> String.trim)
       |> Seq.filter (fun x -> x <> "")
       |> Seq.map int_of_string
     in
-    (* Fmt.(pr "after: %a\n" (seq ~sep:comma int)) numbers'; *)
     match op.[0] with
     | '+' -> numbers' |> Seq.fold_left ( + ) 0
     | '*' -> numbers' |> Seq.fold_left ( * ) 1

@@ -28,7 +28,7 @@ let part1 file =
           acc
           + (range from' to'
              |> List.filter (fun n ->
-               let re = Str.regexp "^\\([0-9]+\\)\\1$" in
+               let re = Str.regexp {| ^\([0-9]+\)\1$ |} in
                Str.string_match re (string_of_int n) 0)
              |> List.fold_left ( + ) 0))
        0

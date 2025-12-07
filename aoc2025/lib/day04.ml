@@ -10,9 +10,6 @@ let parse_input file =
   tbl
 ;;
 
-let height tbl = tbl |> Hashtbl.to_seq_keys |> Seq.map fst |> Seq.fold_left max 0
-let width tbl = tbl |> Hashtbl.to_seq_keys |> Seq.map snd |> Seq.fold_left max 0
-
 let neighbours tbl (row, col) =
   [ row + 1, col
   ; row - 1, col
